@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, redirect, session
+from flask import Flask, request, redirect, session, render_template
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
@@ -44,15 +44,11 @@ def stats():
         return redirect('/') 
 
     sp = spotipy.Spotify(auth=token_info['access_token'])
-
+    user_profile = sp.current_user()
+    user_name = user_profile.get('display_name')
     top_tracks = sp.current_user_top_tracks(limit=10, time_range='medium_term')
     
-    html = "<h2>Τα 10 Αγαπημένα σου Τραγούδια:</h2><ul>"
-    for track in top_tracks['items']:
-        song_name = track['name']
-        artist_name = track['artists'][0]['name']
-        html += f"<li><b>{song_name}</b> από <i>{artist_name}</i></li>"
-    html += "</ul>"
+    return render_template('index.html', user_name=user_name, tracks=top_tracks['items'])
 
     return html
 
