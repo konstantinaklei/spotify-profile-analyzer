@@ -15,77 +15,69 @@
             padding: 40px;
         }
 
-        .header-section {
-            margin-bottom: 40px;
+        .header-section { margin-bottom: 30px; }
+        .greeting { font-size: 32px; font-weight: 900; margin: 0; }
+        
+        .menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
         }
-
-        .greeting {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin: 0;
-        }
-
-        h2 {
-            color: #1DB954; 
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            background-color: #181818; 
-            margin-bottom: 12px;
-            padding: 15px 20px;
-            border-radius: 8px; 
-            transition: background-color 0.3s;
-        }
-
-        li:hover {
-            background-color: #282828; 
-        }
-
-        .song-name {
-            font-weight: 700;
+        
+        .menu-btn {
+            background-color: transparent;
+            color: #B3B3B3;
+            border: none;
             font-size: 18px;
-            margin-bottom: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 20px;
+            transition: all 0.2s;
         }
 
-        .artist-name {
-            color: #B3B3B3; 
-            font-size: 14px;
-            font-weight: 400;
+        .menu-btn:hover { color: #FFF; }
+        
+        .menu-btn.active {
+            background-color: #1DB954; 
+            color: #FFF;
         }
-        .track-item {
-        display: flex; 
-        align-items: center; 
-        background-color: #181818;
-        padding: 10px 20px;
-        margin-bottom: 8px;
-        border-radius: 5px;
-    }
-    
-    .track-rank {
-        width: 30px;
-        font-weight: bold;
-        font-size: 18px;
-    }
 
-    .track-image {
-        width: 50px;
-        height: 50px;
-        border-radius: 4px;
-        margin-right: 15px;
-    }
+        .list-container {
+            display: none; 
+        }
 
-    .track-info {
-        display: flex;
-        flex-direction: column; 
-    }
+        .list-container.active {
+            display: block; 
+        }
+
+        .item-card {
+            display: flex; 
+            align-items: center; 
+            background-color: #181818;
+            padding: 10px 20px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .item-card:hover { background-color: #282828; }
+
+        .rank { width: 30px; font-weight: bold; font-size: 18px; color: #B3B3B3; }
+        
+        .item-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px; 
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .artist-image { border-radius: 50%; } 
+
+        .item-info { display: flex; flex-direction: column; }
+        .title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+        .subtitle { color: #B3B3B3; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -94,23 +86,55 @@
         <h1 class="greeting" id="dynamic-greeting"></h1>
     </div>
 
-    <h2>Τα 10 Αγαπημένα σου Τραγούδια</h2>
-    <ul>
+    <div class="menu">
+        <button class="menu-btn active" onclick="switchTab('tracks')">Top Tracks</button>
+        <button class="menu-btn" onclick="switchTab('artists')">Top Artists</button>
+    </div>
+
+    <div id="tracks-list" class="list-container active">
         {% for track in tracks %}
-        <li>
-            <div class="song-name">{{ track.name }}</div>
-            <div class="artist-name">{{ track.artists[0].name }}</div>
-        </li>
+        <div class="item-card">
+            <div class="rank">{{ loop.index }}</div>
+            <img class="item-image" src="{{ track.album.images[0].url }}" alt="Album cover">
+            <div class="item-info">
+                <div class="title">{{ track.name }}</div>
+                <div class="subtitle">{{ track.artists[0].name }}</div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+
+    <div id="artists-list" class="list-container">
+        {% for artist in artists %}
+        <div class="item-card">
+            <div class="rank">{{ loop.index }}</div>
+            <img class="item-image artist-image" src="{{ artist.images[0].url }}" alt="Artist image">
+            <div class="item-info">
+                <div class="title">{{ artist.name }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
     <script>
         const hour = new Date().getHours();
         let greetingWord = (hour < 12) ? "ΚΑΛΗΜΕΡΑ" : "ΚΑΛΗΣΠΕΡΑ";
-        
         const userName = "{{ user_name }}".toUpperCase();
-        
         document.getElementById("dynamic-greeting").innerText = greetingWord + " " + userName;
+
+        // Tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.list-container').forEach(list => list.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (tabName === 'tracks') {
+                document.getElementById('tracks-list').classList.add('active');
+                document.querySelectorAll('.menu-btn')[0].classList.add('active');
+            } else if (tabName === 'artists') {
+                document.getElementById('artists-list').classList.add('active');
+                document.querySelectorAll('.menu-btn')[1].classList.add('active');
+            }
+        }
     </script>
 
 </body>
