@@ -45,14 +45,21 @@ def stats():
 
     try:
         sp = spotipy.Spotify(auth=token_info['access_token'])
-
+        # collecting user's info
         user_profile = sp.current_user()
         user_name = user_profile.get('display_name')
 
+        # collecting songs
         top_tracks = sp.current_user_top_tracks(limit=10, time_range='medium_term')
         
-        return render_template('index.html', user_name=user_name, tracks=top_tracks['items'])
+        # collecting artists
+        top_artists = sp.current_user_top_artists(limit=10, time_range='medium_term')
         
+        return render_template('index.html', 
+                               user_name=user_name, 
+                               tracks=top_tracks['items'], 
+                               artists=top_artists['items'])
+       
     except spotipy.exceptions.SpotifyException as e:
         if e.http_status == 401:
             session.pop('token_info', None) # delete the expired token
