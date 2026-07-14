@@ -54,6 +54,53 @@ def stats():
         
         # collecting artists
         top_artists = sp.current_user_top_artists(limit=10, time_range='medium_term')
+
+        #genres
+        all_genres = []
+        for artist in top_artists['items']:
+            all_genres.extend(artist['genres'])
+        genres_text = " ".join(all_genres).lower()
+
+        if 'rap' in genres_text or 'hip hop' in genres_text or 'trap' in genres_text:
+            outfit = "Oversized ρούχα, sneakers και γενικά Streetwear καταστάσεις!"
+            hobby = "Skateboard, Graffiti ή απλά άραγμα σε πλατείες με την παρέα."
+            destination = "Νέα Υόρκη ή Βερολίνο"
+            
+        elif 'rock' in genres_text or 'metal' in genres_text or 'punk' in genres_text:
+            outfit = "Δερμάτινα μπουφάν, αρβύλες και band tees. 🎸🤘"
+            hobby = "Boxing, Motocycling για να εκτονώσεις την ένταση"
+            destination = "Λονδίνο ή Άμστερνταμ!"
+            
+        elif 'pop' in genres_text or 'dance' in genres_text:
+            outfit = "Φωτεινά χρώματα και ό,τι είναι trend τώρα! ✨👗"
+            hobby = "Χορός, ζωγραφική και shopping therapy"
+            destination = "Παρίσι, Λος Άντζελες ή Ίμπιζα!"
+            
+        elif 'indie' in genres_text or 'alternative' in genres_text:
+            outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags. 🍂👓"
+            hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
+            destination = "Βαρκελώνη ή Φλωρεντία!"
+            
+        else:
+            outfit = "Άνετα, χαλαρά ρούχα, το δικό σου μοναδικό στυλ! 👕"
+            hobby = "Road trips, ταινίες και ανακάλυψη νέας μουσικής."
+            destination = "Κάπου παραθαλάσσια στην Ελλάδα!"
+
+        return render_template('index.html', 
+                               user_name=user_name, 
+                               tracks=top_tracks['items'], 
+                               artists=top_artists['items'],
+                               outfit=outfit,
+                               hobby=hobby,
+                               destination=destination)
+
+    except spotipy.exceptions.SpotifyException as e:
+        if e.http_status == 401:
+            session.pop('token_info', None) 
+            return redirect('/')
+        else:
+            return f"Προέκυψε ένα σφάλμα με το Spotify: {e}"
+
         
         return render_template('index.html', 
                                user_name=user_name, 
