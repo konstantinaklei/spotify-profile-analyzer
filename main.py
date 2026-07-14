@@ -50,10 +50,10 @@ def stats():
         user_name = user_profile.get('display_name')
 
         # collecting songs
-        top_tracks = sp.current_user_top_tracks(limit=10, time_range='medium_term')
+        top_tracks = sp.current_user_top_tracks(limit=10, time_range='short_term') #'short_term' = last 4 weeks
         
         # collecting artists
-        top_artists = sp.current_user_top_artists(limit=10, time_range='medium_term')
+        top_artists = sp.current_user_top_artists(limit=10, time_range='short_term')
 
         #genres
         all_genres = []
