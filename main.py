@@ -58,7 +58,7 @@ def stats():
         #genres
         all_genres = []
         for artist in top_artists['items']:
-            all_genres.extend(artist['genres'])
+            all_genres.extend(artist.get('genres', []))
         genres_text = " ".join(all_genres).lower()
 
         if 'rap' in genres_text or 'hip hop' in genres_text or 'trap' in genres_text:
