@@ -62,31 +62,37 @@ def stats():
         genres_text = " ".join(all_genres).lower()
 
         if 'rap' in genres_text or 'hip hop' in genres_text or 'trap' in genres_text:
+            matched_genre = "Street vibe"
             outfit = "Oversized ρούχα, sneakers και γενικά Streetwear καταστάσεις!"
             hobby = "Skateboard, Graffiti ή απλά άραγμα σε πλατείες με την παρέα."
             destination = "Νέα Υόρκη ή Βερολίνο"
             
         elif 'rock' in genres_text or 'metal' in genres_text or 'punk' in genres_text:
+            matched_genre = "Rock n roll"
             outfit = "Δερμάτινα μπουφάν, αρβύλες και band tees. 🎸🤘"
             hobby = "Boxing, Motocycling για να εκτονώσεις την ένταση"
             destination = "Λονδίνο ή Άμστερνταμ!"
             
         elif 'pop' in genres_text or 'dance' in genres_text:
+            matched_genre = "Dancey pop"
             outfit = "Φωτεινά χρώματα και ό,τι είναι trend τώρα! ✨👗"
             hobby = "Χορός, ζωγραφική και shopping therapy"
             destination = "Παρίσι, Λος Άντζελες ή Ίμπιζα!"
             
         elif 'indie' in genres_text or 'alternative' in genres_text:
+            matched_genre = "Indie alt"
             outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags. 🍂👓"
             hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
             destination = "Βαρκελώνη ή Φλωρεντία!"
             
         else:
+            matched_genre = "Its complicated"
             outfit = "Άνετα, χαλαρά ρούχα, το δικό σου μοναδικό στυλ! 👕"
             hobby = "Road trips, ταινίες και ανακάλυψη νέας μουσικής."
             destination = "Κάπου παραθαλάσσια στην Ελλάδα!"
 
         return render_template('index.html', 
+                               matched_genre = matched_genre,
                                user_name=user_name, 
                                tracks=top_tracks['items'], 
                                artists=top_artists['items'],

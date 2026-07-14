@@ -54,7 +54,7 @@
     <div class="menu">
         <button class="menu-btn active" onclick="switchTab('tracks')">Top Tracks</button>
         <button class="menu-btn" onclick="switchTab('artists')">Top Artists</button>
-        <button class="menu-btn" onclick="switchTab('vibe')">Το Vibe Μου 🔮</button>
+        <button class="menu-btn" onclick="switchTab('vibe')">Το Vibe Μου</button>
     </div>
 
     <div id="tracks-list" class="list-container active">
@@ -84,6 +84,14 @@
 
     <div id="vibe-list" class="list-container">
         
+        <div style="text-align: center; margin-bottom: 30px;">
+            {% if user_image_url %}
+                <img src="{{ user_image_url }}" alt="Profile Picture" class="profile-pic" style="width: 120px; height: 120px; margin: 0 auto; display: block; margin-bottom: 15px;">
+            {% endif %}
+            <h3 style="color: #1DB954; font-size: 16px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Το Κυριαρχο Ειδος σου</h3>
+            <h2 style="font-size: 32px; font-weight: 900; margin-top: 5px;">{{ matched_genre }}</h2>
+        </div>
+
         <div class="vibe-card">
             <div class="vibe-question">Τι Outfit σου ταιριαζει;</div>
             <div class="vibe-answer">{{ outfit }}</div>
@@ -100,7 +108,6 @@
         </div>
 
     </div>
-
     <script>
         const hour = new Date().getHours();
         let greetingWord = (hour < 12) ? "ΚΑΛΗΜΕΡΑ" : "ΚΑΛΗΣΠΕΡΑ";
