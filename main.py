@@ -103,6 +103,14 @@ def stats():
         for artist in top_artists2['items']:
             print(f"- {artist['name']}: {artist.get('genres', [])}")
 
+        print(" short_term")
+        for tracks in top_tracks1['items']:
+            print(f"- {artist['name']}: {artist.get('genres', [])}")
+            
+        print("\n long_term")
+        for tracks in top_tracks2['items']:
+            print(f"- {artist['name']}: {artist.get('genres', [])}")
+
         vibe_scores = {
             'rap': 0,
             'rock': 0,
