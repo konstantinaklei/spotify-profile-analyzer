@@ -95,21 +95,17 @@ def stats():
         # debug
         #print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
         
-        print(" short_term")
-        for artist in top_artists1['items']:
-            print(f"- {artist['name']}: {artist.get('genres', [])}")
+        print("\n TRACKS - short_term")
+        for track in top_tracks1['items']:
+            track_name = track['name']
+            artist_name = track['artists'][0]['name']
+            print(f"- {track_name} (από: {artist_name})")
             
-        print("\n long_term")
-        for artist in top_artists2['items']:
-            print(f"- {artist['name']}: {artist.get('genres', [])}")
-
-        print(" short_term")
-        for tracks in top_tracks1['items']:
-            print(f"- {artist['name']}: {artist.get('genres', [])}")
-            
-        print("\n long_term")
-        for tracks in top_tracks2['items']:
-            print(f"- {artist['name']}: {artist.get('genres', [])}")
+        print("\n TRACKS - long_term")
+        for track in top_tracks2['items']:
+            track_name = track['name']
+            artist_name = track['artists'][0]['name']
+            print(f"- {track_name} (από: {artist_name})")
 
         vibe_scores = {
             'rap': 0,
