@@ -61,36 +61,52 @@ def stats():
             all_genres.extend(artist.get('genres', []))
         genres_text = " ".join(all_genres).lower()
 
-        if 'rap' in genres_text or 'hip hop' in genres_text or 'trap' in genres_text:
-            matched_genre = "Street vibe"
-            outfit = "Oversized ρούχα, sneakers και γενικά Streetwear καταστάσεις!"
-            hobby = "Skateboard, Graffiti ή απλά άραγμα σε πλατείες με την παρέα."
-            destination = "Νέα Υόρκη ή Βερολίνο"
-            
-        elif 'rock' in genres_text or 'metal' in genres_text or 'punk' in genres_text:
-            matched_genre = "Rock n roll"
-            outfit = "Δερμάτινα μπουφάν, αρβύλες και band tees. 🎸🤘"
-            hobby = "Boxing, Motocycling για να εκτονώσεις την ένταση"
-            destination = "Λονδίνο ή Άμστερνταμ!"
-            
-        elif 'pop' in genres_text or 'dance' in genres_text:
-            matched_genre = "Dancey pop"
-            outfit = "Φωτεινά χρώματα και ό,τι είναι trend τώρα! ✨👗"
-            hobby = "Χορός, ζωγραφική και shopping therapy"
-            destination = "Παρίσι, Λος Άντζελες ή Ίμπιζα!"
-            
-        elif 'indie' in genres_text or 'alternative' in genres_text:
-            matched_genre = "Indie alt"
-            outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags. 🍂👓"
-            hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
-            destination = "Βαρκελώνη ή Φλωρεντία!"
-            
-        else:
+        vibe_scores = {
+            'rap': 0,
+            'rock': 0,
+            'pop': 0,
+            'indie': 0
+        }
+
+        for genre in all_genres:
+            genre_lower = genre.lower()
+            if 'rap' in genre_lower or 'hip hop' in genre_lower or 'trap' in genre_lower or 'drill' in genre_lower:
+                vibe_scores['rap'] += 1
+            elif 'rock' in genre_lower or 'metal' in genre_lower or 'punk' in genre_lower:
+                vibe_scores['rock'] += 1
+            elif 'pop' in genre_lower or 'dance' in genre_lower or 'house' in genre_lower:
+                vibe_scores['pop'] += 1
+            elif 'indie' in genre_lower or 'alternative' in genre_lower or 'folk' in genre_lower:
+                vibe_scores['indie'] += 1
+
+        dominant = max(vibe_scores, key=vibe_scores.get)
+        max_score = vibe_scores[dominant]
+
+        if max_score == 0:
             matched_genre = "Its complicated"
-            outfit = "Άνετα, χαλαρά ρούχα, το δικό σου μοναδικό στυλ! 👕"
+            outfit = "Άνετα, χαλαρά ρούχα, το δικό σου μοναδικό στυλ!"
             hobby = "Road trips, ταινίες και ανακάλυψη νέας μουσικής."
             destination = "Κάπου παραθαλάσσια στην Ελλάδα!"
-
+        elif dominant == 'rap':
+            matched_genre = "Rap / Hip-Hop "
+            outfit = "Oversized ρούχα, sneakers και γενικά Streetwear καταστάσεις! "
+            hobby = "Skateboard, Graffiti ή απλά άραγμα σε πλατείες με την παρέα."
+            destination = "Νέα Υόρκη ή Βερολίνο!"
+        elif dominant == 'rock':
+            matched_genre = "Rock / Metal "
+            outfit = "Μαύρα ρούχα, δερμάτινα μπουφάν, αρβύλες και σκουρόχρωμο μακιγιάζ"
+            hobby = "Συναυλίες, συλλογή βινυλίων ή εκμάθηση ηλεκτρικής κιθάρας."
+            destination = "Λονδίνο ή Άμστερνταμ"
+        elif dominant == 'pop':
+            matched_genre = "Pop / Dance "
+            outfit = "Casual Chic, φωτεινά χρώματα και ό,τι είναι trend! "
+            hobby = "Χορός, φωτογραφία ή δημιουργία περιεχομένου."
+            destination = "Παρίσι ή Λος Άντζελες!"
+        elif dominant == 'indie':
+            matched_genre = "Indie / Alternative "
+            outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags."
+            hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
+            destination = "Βαρκελώνη ή Φλωρεντία!"
         return render_template('index.html', 
                                matched_genre = matched_genre,
                                user_name=user_name, 
