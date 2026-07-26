@@ -64,7 +64,7 @@ def stats():
         top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
 
         #genres
-        #all_genres = []
+        all_genres = []
         #for artist in top_artists1['items'] + top_artists2['items']:
         #    all_genres.extend(artist.get('genres', []))
 
@@ -95,14 +95,14 @@ def stats():
         # debug
         #print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
         
-        print("👉 ΜΗΝΑΣ (short_term):")
+        print(" short_term")
         for artist in top_artists1['items']:
             print(f"- {artist['name']}: {artist.get('genres', [])}")
             
-        print("\n👉 ΟΛΩΝ ΤΩΝ ΕΠΟΧΩΝ (long_term):")
+        print("\n long_term")
         for artist in top_artists2['items']:
             print(f"- {artist['name']}: {artist.get('genres', [])}")
-            
+
         vibe_scores = {
             'rap': 0,
             'rock': 0,
