@@ -18,7 +18,8 @@ sp_oauth = SpotifyOAuth(
     client_secret=CLIENT_SECRET,
     redirect_uri=REDIRECT_URI,
     scope="user-top-read",
-    show_dialog=True
+    show_dialog=True,
+    cache_handler=spotipy.cache_handler.MemoryCacheHandler()
 )
 
 @app.route('/')
@@ -37,6 +38,11 @@ def callback():
     session['token_info'] = token_info
 
     return redirect('/stats')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
 
 @app.route('/stats')
 def stats():
