@@ -64,37 +64,45 @@ def stats():
         top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
 
         #genres
-        all_genres = []
+        #all_genres = []
         #for artist in top_artists1['items'] + top_artists2['items']:
         #    all_genres.extend(artist.get('genres', []))
 
         # using top artists's genre 
-        track_artist_ids = []
+        #track_artist_ids = []
         
-        for track in top_tracks1['items'] + top_tracks2['items']:
-            for track_artist in track['artists']:
-                if track_artist['id'] not in track_artist_ids:
-                    track_artist_ids.append(track_artist['id'])
+        #for track in top_tracks1['items'] + top_tracks2['items']:
+            #for track_artist in track['artists']:
+                #if track_artist['id'] not in track_artist_ids:
+                    #track_artist_ids.append(track_artist['id'])
 
 
-        for i in range(0, len(track_artist_ids), 50):
-            batch_ids = track_artist_ids[i:i+50]
-            try:
+        #for i in range(0, len(track_artist_ids), 50):
+            #batch_ids = track_artist_ids[i:i+50]
+            #try:
                 # Ζητάμε τα δεδομένα από το Spotify
-                full_artists = sp.artists(batch_ids)
-                for artist in full_artists['artists']:
-                    if artist:
-                        all_genres.extend(artist.get('genres', []))
-                    else:
-                        print("not found")
-            except spotipy.exceptions.SpotifyException as e:
+                #full_artists = sp.artists(batch_ids)
+                #for artist in full_artists['artists']:
+                    #if artist:
+                        #all_genres.extend(artist.get('genres', []))
+                    #else:
+                        #print("not found")
+            #except spotipy.exceptions.SpotifyException as e:
                 # Αν το Spotify μας πετάξει 403 Forbidden, το αγνοούμε και προχωράμε!
-                print(f"Προειδοποίηση: Το Spotify μπλόκαρε κάποιους καλλιτέχνες.")
-                pass
+                #print(f"Προειδοποίηση: Το Spotify μπλόκαρε κάποιους καλλιτέχνες.")
+                #pass
 
         # debug
-        print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
+        #print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
         
+        print("👉 ΜΗΝΑΣ (short_term):")
+        for artist in top_artists1['items']:
+            print(f"- {artist['name']}: {artist.get('genres', [])}")
+            
+        print("\n👉 ΟΛΩΝ ΤΩΝ ΕΠΟΧΩΝ (long_term):")
+        for artist in top_artists2['items']:
+            print(f"- {artist['name']}: {artist.get('genres', [])}")
+            
         vibe_scores = {
             'rap': 0,
             'rock': 0,
