@@ -79,12 +79,18 @@ def stats():
 
         for i in range(0, len(track_artist_ids), 50):
             batch_ids = track_artist_ids[i:i+50]
-            full_artists = sp.artists(batch_ids)
-            for artist in full_artists['artists']:
-                if artist:
-                    all_genres.extend(artist.get('genres', []))
-                else:
-                    print("not found")
+            try:
+                # Ζητάμε τα δεδομένα από το Spotify
+                full_artists = sp.artists(batch_ids)
+                for artist in full_artists['artists']:
+                    if artist:
+                        all_genres.extend(artist.get('genres', []))
+                    else:
+                        print("not found")
+            except spotipy.exceptions.SpotifyException as e:
+                # Αν το Spotify μας πετάξει 403 Forbidden, το αγνοούμε και προχωράμε!
+                print(f"Προειδοποίηση: Το Spotify μπλόκαρε κάποιους καλλιτέχνες.")
+                pass
 
         # debug
         print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
@@ -135,33 +141,21 @@ def stats():
             outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags."
             hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
             destination = "Βαρκελώνη ή Φλωρεντία!"
+
         return render_template('index.html', 
-                               matched_genre = matched_genre,
-                               user_name=user_name, 
-                               tracks1=top_tracks1['items'], 
-                               artists1=top_artists1['items'],
-                               tracks2=top_tracks2['items'], 
-                               artists2=top_artists2['items'],
-                               outfit=outfit,
-                               hobby=hobby,
-                               destination=destination)
+                                   matched_genre = matched_genre,
+                                   user_name=user_name, 
+                                   tracks1=top_tracks1['items'], 
+                                   artists1=top_artists1['items'],
+                                   tracks2=top_tracks2['items'], 
+                                   artists2=top_artists2['items'],
+                                   outfit=outfit,
+                                   hobby=hobby,
+                                   destination=destination)
 
     except spotipy.exceptions.SpotifyException as e:
         if e.http_status == 401:
             session.pop('token_info', None) 
-            return redirect('/')
-        else:
-            return f"Προέκυψε ένα σφάλμα με το Spotify: {e}"
-
-        
-        return render_template('index.html', 
-                               user_name=user_name, 
-                               tracks=top_tracks['items'], 
-                               artists=top_artists['items'])
-       
-    except spotipy.exceptions.SpotifyException as e:
-        if e.http_status == 401:
-            session.pop('token_info', None) # delete the expired token
             return redirect('/')
         else:
             return f"Προέκυψε ένα σφάλμα με το Spotify: {e}"
