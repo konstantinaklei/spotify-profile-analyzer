@@ -65,10 +65,12 @@ def stats():
 
         #genres
         all_genres = []
+        for artist in top_artists2['items']:
+            all_genres.extend(artist.get('genres', []))
+            
         for artist in top_artists1['items']:
             all_genres.extend(artist.get('genres', []))
-        genres_text = " ".join(all_genres).lower()
-
+            
         #debug
         print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
         
