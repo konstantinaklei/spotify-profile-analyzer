@@ -65,13 +65,28 @@ def stats():
 
         #genres
         all_genres = []
-        for artist in top_artists2['items']:
+        for artist in top_artists1['items'] + top_artists2['items']:
             all_genres.extend(artist.get('genres', []))
-            
-        for artist in top_artists1['items']:
-            all_genres.extend(artist.get('genres', []))
-            
-        #debug
+
+        # using top artists's genre 
+        track_artist_ids = []
+        
+        for track in top_tracks1['items'] + top_tracks2['items']:
+            for track_artist in track['artists']:
+                if track_artist['id'] not in track_artist_ids:
+                    track_artist_ids.append(track_artist['id'])
+
+
+        for i in range(0, len(track_artist_ids), 50):
+            batch_ids = track_artist_ids[i:i+50]
+            full_artists = sp.artists(batch_ids)
+            for artist in full_artists['artists']:
+                if artist:
+                    all_genres.extend(artist.get('genres', []))
+                else:
+                    print("not found")
+
+        # debug
         print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
         
         vibe_scores = {
