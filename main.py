@@ -57,14 +57,15 @@ def stats():
         user_name = user_profile.get('display_name')
 
         # collecting songs
-        top_tracks = sp.current_user_top_tracks(limit=10, time_range='short_term') #'short_term' = last 4 weeks
-        
+        top_tracks1 = sp.current_user_top_tracks(limit=10, time_range='short_term') #'short_term' = last 4 weeks
+        top_tracks2 = sp.current_user_top_tracks(limit=10, time_range='long_term') #'short_term' = last years
         # collecting artists
-        top_artists = sp.current_user_top_artists(limit=10, time_range='short_term')
+        top_artists1 = sp.current_user_top_artists(limit=10, time_range='short_term')
+        top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
 
         #genres
         all_genres = []
-        for artist in top_artists['items']:
+        for artist in top_artists1['items']:
             all_genres.extend(artist.get('genres', []))
         genres_text = " ".join(all_genres).lower()
 
@@ -117,8 +118,10 @@ def stats():
         return render_template('index.html', 
                                matched_genre = matched_genre,
                                user_name=user_name, 
-                               tracks=top_tracks['items'], 
-                               artists=top_artists['items'],
+                               tracks1=top_tracks1['items'], 
+                               artists1=top_artists1['items'],
+                               tracks2=top_tracks2['items'], 
+                               artists2=top_artists2['items'],
                                outfit=outfit,
                                hobby=hobby,
                                destination=destination)

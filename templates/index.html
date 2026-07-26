@@ -52,13 +52,30 @@
     </div>
 
     <div class="menu">
-        <button class="menu-btn active" onclick="switchTab('tracks')">Top Tracks</button>
-        <button class="menu-btn" onclick="switchTab('artists')">Top Artists</button>
-        <button class="menu-btn" onclick="switchTab('vibe')">Το Vibe Μου</button>
+        <button class="menu-btn active" onclick="switchTab('tracks-short', this)">Tracks (Μήνας)</button>
+        <button class="menu-btn" onclick="switchTab('tracks-long', this)">Tracks (Πάντα)</button>
+        <button class="menu-btn" onclick="switchTab('artists-short', this)">Artists (Μήνας)</button>
+        <button class="menu-btn" onclick="switchTab('artists-long', this)">Artists (Πάντα)</button>
+        <button class="menu-btn" onclick="switchTab('vibe', this)">Το Vibe μου </button>
     </div>
 
-    <div id="tracks-list" class="list-container active">
-        {% for track in tracks %}
+<div id="tracks-short-list" class="list-container active">
+        {% for track in tracks1 %}
+        <div class="item-card">
+            <div class="rank">{{ loop.index }}</div>
+            <img class="item-image" src="{{ track.album.images[0].url }}" alt="Album cover">
+            <div class="item-info">
+                <div class="title">{{ track.name }}</div>
+                <div class="subtitle">{{ track.artists[0].name }}</div>
+            </div>
+        </div>
+        {% else %}
+        <p style="color: #B3B3B3;">Δεν υπάρχουν αρκετά δεδομένα για τον τελευταίο μήνα! Άκου λίγη μουσική και έλα πάλι. 🎧</p>
+        {% endfor %}
+    </div>
+
+    <div id="tracks-long-list" class="list-container">
+        {% for track in tracks2 %}
         <div class="item-card">
             <div class="rank">{{ loop.index }}</div>
             <img class="item-image" src="{{ track.album.images[0].url }}" alt="Album cover">
@@ -70,8 +87,21 @@
         {% endfor %}
     </div>
 
-    <div id="artists-list" class="list-container">
-        {% for artist in artists %}
+    <div id="artists-short-list" class="list-container">
+        {% for artist in artists1 %}
+        <div class="item-card">
+            <div class="rank">{{ loop.index }}</div>
+            <img class="item-image artist-image" src="{{ artist.images[0].url }}" alt="Artist image">
+            <div class="item-info">
+                <div class="title">{{ artist.name }}</div>
+            </div>
+        </div>
+        {% else %}
+        <p style="color: #B3B3B3;">Δεν υπάρχουν αρκετά δεδομένα για τον τελευταίο μήνα! 🎧</p>
+        {% endfor %}
+    </div>
+    <div id="artists-long-list" class="list-container">
+        {% for artist in artists2 %}
         <div class="item-card">
             <div class="rank">{{ loop.index }}</div>
             <img class="item-image artist-image" src="{{ artist.images[0].url }}" alt="Artist image">
@@ -90,6 +120,7 @@
             {% endif %}
             <h3 style="color: #1DB954; font-size: 16px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Το Κυριαρχο Vibe σου</h3>
             <h2 style="font-size: 32px; font-weight: 900; margin-top: 5px;">{{ matched_genre }}</h2>
+            <a href="/logout" style="margin-left: auto; color: #B3B3B3; text-decoration: none; font-size: 14px; border: 1px solid #B3B3B3; padding: 5px 15px; border-radius: 20px;">Αποσύνδεση</a>
         </div>
 
         <div class="vibe-card">
@@ -114,20 +145,11 @@
         const userName = "{{ user_name }}".toUpperCase();
         document.getElementById("dynamic-greeting").innerText = greetingWord + " " + userName;
 
-        function switchTab(tabName) {
+        function switchTab(tabName, btnElement) {
             document.querySelectorAll('.list-container').forEach(list => list.classList.remove('active'));
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-
-            if (tabName === 'tracks') {
-                document.getElementById('tracks-list').classList.add('active');
-                document.querySelectorAll('.menu-btn')[0].classList.add('active');
-            } else if (tabName === 'artists') {
-                document.getElementById('artists-list').classList.add('active');
-                document.querySelectorAll('.menu-btn')[1].classList.add('active');
-            } else if (tabName === 'vibe') {
-                document.getElementById('vibe-list').classList.add('active');
-                document.querySelectorAll('.menu-btn')[2].classList.add('active');
-            }
+            document.getElementById(tabName + '-list').classList.add('active');
+            btnElement.classList.add('active');
         }
     </script>
 
