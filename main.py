@@ -69,6 +69,9 @@ def stats():
             all_genres.extend(artist.get('genres', []))
         genres_text = " ".join(all_genres).lower()
 
+        #debug
+        print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
+        
         vibe_scores = {
             'rap': 0,
             'rock': 0,
