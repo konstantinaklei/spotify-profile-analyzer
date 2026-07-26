@@ -65,8 +65,8 @@ def stats():
 
         #genres
         all_genres = []
-        for artist in top_artists1['items'] + top_artists2['items']:
-            all_genres.extend(artist.get('genres', []))
+        #for artist in top_artists1['items'] + top_artists2['items']:
+        #    all_genres.extend(artist.get('genres', []))
 
         # using top artists's genre 
         track_artist_ids = []
