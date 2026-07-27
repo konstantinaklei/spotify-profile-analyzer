@@ -53,11 +53,14 @@ def stats():
         return redirect('/') 
 
     try:
-        # Παίρνουμε το Access Token από το session
-        ACCESS_TOKEN = token_info['access_token']
         
-        # Κρατάμε το spotipy για τα βασικά (όνομα & tracks)
-        sp = spotipy.Spotify(auth=ACCESS_TOKEN)
+        
+        if isinstance(token_info, dict):
+            access_token = token_info.get('access_token')
+        else:
+            access_token = token_info
+
+        sp = spotipy.Spotify(auth=access_token)
         user_profile = sp.current_user()
         user_name = user_profile.get('display_name')
         
@@ -68,7 +71,7 @@ def stats():
 
         url = "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50"
         headers = {
-            "Authorization": f"Bearer {ACCESS_TOKEN}"
+            "Authorization": f"Bearer {access_token}"
         }
 
         response = requests.get(url, headers=headers)
