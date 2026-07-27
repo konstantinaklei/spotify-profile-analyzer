@@ -70,65 +70,49 @@ def stats():
         top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
         all_artists = top_artists1.get('items', []) + top_artists2.get('items', [])
         
-        artist_ids = []
-        for artist in all_artists:
-            if artist.get('id') and artist.get('id') not in artist_ids:
-                artist_ids.append(artist.get('id'))
-
-        all_genres = []
+        track_ids = [track['id'] for track in top_tracks1['items']]
         
-        if artist_ids:
-            try:
-                full_artists = sp.artists(artist_ids[:50]) 
-                for artist in full_artists['artists']:
-                    if artist and 'genres' in artist:
-                        all_genres.extend(artist['genres'])
-            except Exception as e:
-                print(f"Σφάλμα κατά την άντληση των πλήρων καλλιτεχνών: {e}")
-
-        if not all_genres:
-            print("\nΠΡΟΣΟΧΗ: Δεν βρέθηκε κανένα απολύτως genre στο Spotify σου!")
-            dominant = "unknown"
-        else:
-            genre_counts = Counter(all_genres)
-            top_5_genres = genre_counts.most_common(5)
-            
-            print("\n--- ΤΑ 5 ΚΟΡΥΦΑΙΑ ΕΙΔΗ ΣΟΥ ---")
-            for rank, (genre, count) in enumerate(top_5_genres, 1):
-                print(f"{rank}. {genre} ({count} εμφανίσεις)")
+        audio_features = sp.audio_features(track_ids)
+        
+        total_energy = 0
+        total_valence = 0
+        valid_tracks = 0
+        
+        for feature in audio_features:
+            if feature:
+                total_energy += feature['energy']
+                total_valence += feature['valence']
+                valid_tracks += 1
                 
-            dominant = top_5_genres[0][0]
+        avg_energy = total_energy / valid_tracks if valid_tracks > 0 else 0
+        avg_valence = total_valence / valid_tracks if valid_tracks > 0 else 0
+        
+        print(f"\n--- VIBE CHECK ---")
+        print(f"Ενέργεια: {avg_energy:.2f} | Διάθεση: {avg_valence:.2f}")
 
-        if dominant == "unknown":
-            matched_genre = "Its complicated"
-            outfit = "Άνετα, χαλαρά ρούχα, το δικό σου μοναδικό στυλ!"
-            hobby = "Road trips, ταινίες και ανακάλυψη νέας μουσικής."
-            destination = "Κάπου παραθαλάσσια στην Ελλάδα!"
-        elif 'rap' in dominant or 'hip hop' in dominant or 'trap' in dominant:
-            matched_genre = "Rap / Hip-Hop "
-            outfit = "Oversized ρούχα, sneakers και γενικά Streetwear καταστάσεις! "
-            hobby = "Skateboard, Graffiti ή απλά άραγμα σε πλατείες με την παρέα."
-            destination = "Νέα Υόρκη ή Βερολίνο!"
-        elif 'rock' in dominant or 'metal' in dominant:
-            matched_genre = "Rock / Metal "
-            outfit = "Μαύρα ρούχα, δερμάτινα μπουφάν, αρβύλες και σκουρόχρωμο μακιγιάζ"
-            hobby = "Συναυλίες, συλλογή βινυλίων ή εκμάθηση ηλεκτρικής κιθάρας."
-            destination = "Λονδίνο ή Άμστερνταμ"
-        elif 'pop' in dominant or 'dance' in dominant:
-            matched_genre = "Pop / Dance "
-            outfit = "Casual Chic, φωτεινά χρώματα και ό,τι είναι trend! "
-            hobby = "Χορός, φωτογραφία ή δημιουργία περιεχομένου."
-            destination = "Παρίσι ή Λος Άντζελες!"
-        elif 'indie' in dominant or 'alternative' in dominant:
-            matched_genre = "Indie / Alternative "
-            outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags."
-            hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
-            destination = "Βαρκελώνη ή Φλωρεντία!"
+        if avg_energy > 0.7 and avg_valence > 0.6:
+            matched_genre = "Party animal"
+            outfit = "Φωτεινά χρώματα, εντυπωσιακά sneakers, clubbing & party lifestyle!"
+            hobby = "Χορός, γυμναστική."
+            destination = "Μύκονος ή Ίμπιζα!"
+            
+        elif avg_energy > 0.7 and avg_valence <= 0.6:
+            matched_genre = "Dark & Intense Vibe"
+            outfit = "Μαύρα ρούχα, oversized t-shirts, αρβύλες ή streetwear."
+            hobby = "Συναυλίες, skateboard, gaming."
+            destination = "Βερολίνο ή Λονδίνο!"
+            
+        elif avg_energy <= 0.7 and avg_valence > 0.5:
+            matched_genre = "Chill & Groovy"
+            outfit = "Vintage ρούχα, tote bags, γήινα χρώματα."
+            hobby = "Καφές με φίλους, φωτογραφία, road trips."
+            destination = "Φλωρεντία ή Βαρκελώνη!"
+            
         else:
-            matched_genre = dominant.capitalize()
-            outfit = "Το δικό σου ξεχωριστό στυλ!"
-            hobby = "Να ακούς τη μουσική σου!"
-            destination = "Οπουδήποτε!"
+            matched_genre = "Deep & Melancholic"
+            outfit = "Άνετα ρούχα, φούτερ, cozy στυλ."
+            hobby = "Διάβασμα βιβλίων, ταινίες στο σπίτι, ποίηση."
+            destination = "Ισλανδία ή κάποιο ορεινό χωριό!"
 
         return render_template('index.html', 
                                matched_genre=matched_genre,
