@@ -68,23 +68,17 @@ def stats():
         top_tracks2 = sp.current_user_top_tracks(limit=10, time_range='long_term')
         top_artists1 = sp.current_user_top_artists(limit=10, time_range='short_term')
         top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
+        all_artists = top_artists1.get('items', []) + top_artists2.get('items', [])
+        
+        all_genres = []
+        for artist in all_artists:
+            artist_genres = artist.get('genres', [])
+            all_genres.extend(artist_genres)
 
-        url = "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50"
-        headers = {
-            "Authorization": f"Bearer {access_token}"
-        }
-
-        response = requests.get(url, headers=headers)
-        dominant = ""
-
-        if response.status_code == 200:
-            data = response.json()
-            all_genres = []
-
-            for artist in data['items']:
-                artist_genres = artist.get('genres', [])
-                all_genres.extend(artist_genres)
-
+        if not all_genres:
+            print("\nΠΡΟΣΟΧΗ: Δεν βρέθηκε κανένα απολύτως genre στο Spotify σου!")
+            dominant = "unknown"
+        else:
             genre_counts = Counter(all_genres)
             top_5_genres = genre_counts.most_common(5)
             
@@ -92,13 +86,7 @@ def stats():
             for rank, (genre, count) in enumerate(top_5_genres, 1):
                 print(f"{rank}. {genre} ({count} εμφανίσεις)")
                 
-            if top_5_genres:
-                dominant = top_5_genres[0][0]
-            else:
-                dominant = "unknown"
-        else:
-            print("Σφάλμα στο requests:", response.status_code)
-            dominant = "unknown"
+            dominant = top_5_genres[0][0]
 
         if dominant == "unknown":
             matched_genre = "Its complicated"
