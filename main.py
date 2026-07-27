@@ -70,10 +70,21 @@ def stats():
         top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
         all_artists = top_artists1.get('items', []) + top_artists2.get('items', [])
         
-        all_genres = []
+        artist_ids = []
         for artist in all_artists:
-            artist_genres = artist.get('genres', [])
-            all_genres.extend(artist_genres)
+            if artist.get('id') and artist.get('id') not in artist_ids:
+                artist_ids.append(artist.get('id'))
+
+        all_genres = []
+        
+        if artist_ids:
+            try:
+                full_artists = sp.artists(artist_ids[:50]) 
+                for artist in full_artists['artists']:
+                    if artist and 'genres' in artist:
+                        all_genres.extend(artist['genres'])
+            except Exception as e:
+                print(f"Σφάλμα κατά την άντληση των πλήρων καλλιτεχνών: {e}")
 
         if not all_genres:
             print("\nΠΡΟΣΟΧΗ: Δεν βρέθηκε κανένα απολύτως genre στο Spotify σου!")
