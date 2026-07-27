@@ -3,6 +3,8 @@ from flask import Flask, request, redirect, session, render_template
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
+import requests
+from collections import Counter
 
 load_dotenv()
 
@@ -51,126 +53,94 @@ def stats():
         return redirect('/') 
 
     try:
-        sp = spotipy.Spotify(auth=token_info['access_token'])
-        # collecting user's info
+        # Παίρνουμε το Access Token από το session
+        ACCESS_TOKEN = token_info['access_token']
+        
+        # Κρατάμε το spotipy για τα βασικά (όνομα & tracks)
+        sp = spotipy.Spotify(auth=ACCESS_TOKEN)
         user_profile = sp.current_user()
         user_name = user_profile.get('display_name')
-
-        # collecting songs
-        top_tracks1 = sp.current_user_top_tracks(limit=10, time_range='short_term') #'short_term' = last 4 weeks
-        top_tracks2 = sp.current_user_top_tracks(limit=10, time_range='long_term') #'short_term' = last years
-        # collecting artists
+        
+        top_tracks1 = sp.current_user_top_tracks(limit=10, time_range='short_term') 
+        top_tracks2 = sp.current_user_top_tracks(limit=10, time_range='long_term')
         top_artists1 = sp.current_user_top_artists(limit=10, time_range='short_term')
         top_artists2 = sp.current_user_top_artists(limit=10, time_range='long_term')
 
-        #genres
-        all_genres = []
-        #for artist in top_artists1['items'] + top_artists2['items']:
-        #    all_genres.extend(artist.get('genres', []))
-
-        # using top artists's genre 
-        #track_artist_ids = []
-        
-        #for track in top_tracks1['items'] + top_tracks2['items']:
-            #for track_artist in track['artists']:
-                #if track_artist['id'] not in track_artist_ids:
-                    #track_artist_ids.append(track_artist['id'])
-
-
-        #for i in range(0, len(track_artist_ids), 50):
-            #batch_ids = track_artist_ids[i:i+50]
-            #try:
-                # Ζητάμε τα δεδομένα από το Spotify
-                #full_artists = sp.artists(batch_ids)
-                #for artist in full_artists['artists']:
-                    #if artist:
-                        #all_genres.extend(artist.get('genres', []))
-                    #else:
-                        #print("not found")
-            #except spotipy.exceptions.SpotifyException as e:
-                # Αν το Spotify μας πετάξει 403 Forbidden, το αγνοούμε και προχωράμε!
-                #print(f"Προειδοποίηση: Το Spotify μπλόκαρε κάποιους καλλιτέχνες.")
-                #pass
-
-        # debug
-        #print("ΤΑ ΕΙΔΗ ΤΟΥ ΧΡΗΣΤΗ ΕΙΝΑΙ:", all_genres)
-        
-        print("\n TRACKS - short_term")
-        for track in top_tracks1['items']:
-            track_name = track['name']
-            artist_name = track['artists'][0]['name']
-            print(f"- {track_name} (από: {artist_name})")
-            
-        print("\n TRACKS - long_term")
-        for track in top_tracks2['items']:
-            track_name = track['name']
-            artist_name = track['artists'][0]['name']
-            print(f"- {track_name} (από: {artist_name})")
-
-        vibe_scores = {
-            'rap': 0,
-            'rock': 0,
-            'pop': 0,
-            'indie': 0
+        url = "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50"
+        headers = {
+            "Authorization": f"Bearer {ACCESS_TOKEN}"
         }
 
-        for genre in all_genres:
-            genre_lower = genre.lower()
-            if 'rap' in genre_lower or 'hip hop' in genre_lower or 'trap' in genre_lower or 'drill' in genre_lower:
-                vibe_scores['rap'] += 1
-            elif 'rock' in genre_lower or 'metal' in genre_lower or 'punk' in genre_lower:
-                vibe_scores['rock'] += 1
-            elif 'pop' in genre_lower or 'dance' in genre_lower or 'house' in genre_lower:
-                vibe_scores['pop'] += 1
-            elif 'indie' in genre_lower or 'alternative' in genre_lower or 'folk' in genre_lower:
-                vibe_scores['indie'] += 1
+        response = requests.get(url, headers=headers)
+        dominant = ""
 
-        dominant = max(vibe_scores, key=vibe_scores.get)
-        max_score = vibe_scores[dominant]
+        if response.status_code == 200:
+            data = response.json()
+            all_genres = []
 
-        if max_score == 0:
+            for artist in data['items']:
+                artist_genres = artist.get('genres', [])
+                all_genres.extend(artist_genres)
+
+            genre_counts = Counter(all_genres)
+            top_5_genres = genre_counts.most_common(5)
+            
+            print("\n--- ΤΑ 5 ΚΟΡΥΦΑΙΑ ΕΙΔΗ ΣΟΥ ---")
+            for rank, (genre, count) in enumerate(top_5_genres, 1):
+                print(f"{rank}. {genre} ({count} εμφανίσεις)")
+                
+            if top_5_genres:
+                dominant = top_5_genres[0][0]
+            else:
+                dominant = "unknown"
+        else:
+            print("Σφάλμα στο requests:", response.status_code)
+            dominant = "unknown"
+
+        if dominant == "unknown":
             matched_genre = "Its complicated"
             outfit = "Άνετα, χαλαρά ρούχα, το δικό σου μοναδικό στυλ!"
             hobby = "Road trips, ταινίες και ανακάλυψη νέας μουσικής."
             destination = "Κάπου παραθαλάσσια στην Ελλάδα!"
-        elif dominant == 'rap':
+        elif 'rap' in dominant or 'hip hop' in dominant or 'trap' in dominant:
             matched_genre = "Rap / Hip-Hop "
             outfit = "Oversized ρούχα, sneakers και γενικά Streetwear καταστάσεις! "
             hobby = "Skateboard, Graffiti ή απλά άραγμα σε πλατείες με την παρέα."
             destination = "Νέα Υόρκη ή Βερολίνο!"
-        elif dominant == 'rock':
+        elif 'rock' in dominant or 'metal' in dominant:
             matched_genre = "Rock / Metal "
             outfit = "Μαύρα ρούχα, δερμάτινα μπουφάν, αρβύλες και σκουρόχρωμο μακιγιάζ"
             hobby = "Συναυλίες, συλλογή βινυλίων ή εκμάθηση ηλεκτρικής κιθάρας."
             destination = "Λονδίνο ή Άμστερνταμ"
-        elif dominant == 'pop':
+        elif 'pop' in dominant or 'dance' in dominant:
             matched_genre = "Pop / Dance "
             outfit = "Casual Chic, φωτεινά χρώματα και ό,τι είναι trend! "
             hobby = "Χορός, φωτογραφία ή δημιουργία περιεχομένου."
             destination = "Παρίσι ή Λος Άντζελες!"
-        elif dominant == 'indie':
+        elif 'indie' in dominant or 'alternative' in dominant:
             matched_genre = "Indie / Alternative "
             outfit = "Vintage κομμάτια, thrift shop ευρήματα, tote bags."
             hobby = "Διάβασμα σε cozy καφέ, φωτογραφία με φιλμ, φεστιβάλ."
             destination = "Βαρκελώνη ή Φλωρεντία!"
+        else:
+            matched_genre = dominant.capitalize()
+            outfit = "Το δικό σου ξεχωριστό στυλ!"
+            hobby = "Να ακούς τη μουσική σου!"
+            destination = "Οπουδήποτε!"
 
         return render_template('index.html', 
-                                   matched_genre = matched_genre,
-                                   user_name=user_name, 
-                                   tracks1=top_tracks1['items'], 
-                                   artists1=top_artists1['items'],
-                                   tracks2=top_tracks2['items'], 
-                                   artists2=top_artists2['items'],
-                                   outfit=outfit,
-                                   hobby=hobby,
-                                   destination=destination)
+                               matched_genre=matched_genre,
+                               user_name=user_name, 
+                               tracks1=top_tracks1['items'], 
+                               artists1=top_artists1['items'],
+                               tracks2=top_tracks2['items'], 
+                               artists2=top_artists2['items'],
+                               outfit=outfit,
+                               hobby=hobby,
+                               destination=destination)
 
-    except spotipy.exceptions.SpotifyException as e:
-        if e.http_status == 401:
-            session.pop('token_info', None) 
-            return redirect('/')
-        else:
-            return f"Προέκυψε ένα σφάλμα με το Spotify: {e}"
+    except Exception as e:
+        return f"Προέκυψε ένα σφάλμα: {e}"
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
